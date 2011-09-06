@@ -1,0 +1,7 @@
+author: dave kujawski
+
+i have this little digital picture frame thing that uses a usb stick as storage.
+many of my images are HUGE! the usb stick is not HUGE. and the digital picture frame only has a screen resolution of 640 anyway.
+so, i wanted a tool that i could point at a dir tree of images, resize the image and put them into a flat directory.
+often there were dup file names, so i want to use md5 hashes for the names to keep them unique.
+
