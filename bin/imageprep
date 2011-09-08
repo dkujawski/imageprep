@@ -1,0 +1,7 @@
+#!/bin/bash
+
+THIS_DIR=`dirname $0`
+IMAGEPREP_ROOT=`dirname $THIS_DIR`
+PYTHONPATH=$IMAGEPREP_ROOT/src:$PYTHONPATH
+export PYTHONPATH
+python $IMAGEPREP_ROOT/src/imageprep/cmd.py "$@"
