@@ -40,6 +40,8 @@ if __name__ == '__main__':
     if not args.base:
         bp.print_help()
         sys.exit(1)
-    for img in resize.get_each_resized_img(args.width, args.base):
-        ret = rename.save_img(img, os.path.abspath(args.outdir), hash=args.md5)
+    for base in args.base:
+        for img in resize.get_each_resized_img(args.width, base):
+            ret = rename.save_img(img, os.path.abspath(args.outdir), 
+                                  use_hash=args.md5)
         
