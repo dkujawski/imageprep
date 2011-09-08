@@ -18,7 +18,7 @@ def get_new_filename(img_obj):
     """ return a new filename for the image based on a hash of the new image 
     data. 
     """
-    data = list(img_obj.getdata())
+    data = img_obj.tostring()
     _, ext = os.path.splitext(img_obj.filename)
     return "%s%s" % (get_hash_key(data), ext)
 
