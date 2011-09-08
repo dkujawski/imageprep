@@ -26,7 +26,11 @@ def get_each_img_obj(img_dir):
     for root, _, files in os.walk(img_dir):
         for fn in files:
             fp = os.path.join(root, fn)
-            img = Image.open(fp)
+            try:
+                img = Image.open(fp)
+            except IOError as ioe:
+                print ioe, ", skipping:", fp
+                continue
             if img.format and is_landscape(img):
                 yield img
 
@@ -37,6 +41,7 @@ def get_each_resized_img(new_x, img_dir):
     for img in get_each_img_obj(img_dir):
         new_y = get_new_y(img, new_x)
         new_size = (new_x, new_y)
-        img.resize(new_size, filter_mode)
-        yield img
+        new_img = img.resize(new_size, filter_mode)
+        new_img.filename = img.filename
+        yield new_img
         
