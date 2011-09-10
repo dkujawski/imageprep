@@ -3,9 +3,7 @@ Created on 6/09/2011
 
 @author: dave
 '''
-from multiprocessing import Pool
 import argparse
-import datetime
 import os
 import sys
 
@@ -68,7 +66,6 @@ if __name__ == '__main__':
         import dkprof
         cmd = "run(args)"
         dkprof.do_profile(cmd)
-        
     else:
         run(args)
     print 'done!'
