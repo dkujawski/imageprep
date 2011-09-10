@@ -40,7 +40,7 @@ def save_img(img_obj, out_dir, use_hash=False):
             if os.path.exists(new_path):
                 print ioe, new_path
                 os.remove(new_path)
-                return False
-        return True
+                return
+        return new_path
         
     
