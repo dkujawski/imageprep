@@ -3,10 +3,13 @@ Created on 6/09/2011
 
 @author: dave
 '''
+from multiprocessing import Pool
 import argparse
+import datetime
 import os
 import sys
 
+from imageprep import process
 from imageprep import rename
 from imageprep import resize
 
@@ -32,16 +35,41 @@ def build_parser():
                         default='./', help='output directory for new files')
     parser.add_argument('--md5', action='store_true', default=False,
                         help='use md5 checksum for new file names')
+    parser.add_argument('--profile', action='store_true', default=False,
+                        help='profile the run')
+    parser.add_argument('--faster', action='store_true', default=False,
+                        help='go faster')
+    parser.add_argument('--procs', nargs='?', type=int, default=2,
+                        help='when go faster, set the processes used.')
     return parser
 
+def run(args):
+    out = os.path.abspath(args.outdir)
+    for base in args.base:        
+        print "processing:", base
+        count = 0
+        if args.faster:
+            imgs = process.work(args.width, base, out, args.md5, args.procs)
+            count = len(imgs)
+        else:
+            for img in resize.get_resized_imgs(args.width, base):
+                ret = rename.save_img(img, out, use_hash=args.md5)
+                print ret
+                count += 1
+        print "processed %d images." % count
+        
 if __name__ == '__main__':
     bp = build_parser()
     args = bp.parse_args()
     if not args.base:
         bp.print_help()
         sys.exit(1)
-    for base in args.base:
-        for img in resize.get_each_resized_img(args.width, base):
-            ret = rename.save_img(img, os.path.abspath(args.outdir), 
-                                  use_hash=args.md5)
+    if args.profile:
+        import dkprof
+        cmd = "run(args)"
+        dkprof.do_profile(cmd)
+        
+    else:
+        run(args)
+    print 'done!'
         
