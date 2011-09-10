@@ -3,7 +3,6 @@ Created on 6/09/2011
 
 @author: dave
 '''
-
 import Image
 import os
 
@@ -20,8 +19,8 @@ def get_new_y(img_obj, new_x):
     old_x, old_y = img_obj.size
     return int(float(new_x) / old_x * old_y)
 
-def get_each_img_obj(img_dir):
-    """ walk the img_dir and return each found image as an Image object
+def get_img_objs(img_dir):
+    """ walk the img_dir and build Image objects out of any images found
     """
     for root, _, files in os.walk(img_dir):
         for fn in files:
@@ -34,14 +33,19 @@ def get_each_img_obj(img_dir):
             if img.format and is_landscape(img):
                 yield img
 
-def get_each_resized_img(new_x, img_dir):
-    """ return a resized Image object for each image file found in the img_dir
+def get_resized_imgs(new_x, img_dir):
+    """ return list of resized Image objects for each image file found in the 
+    img_dir
     """
-    filter_mode = Image.ANTIALIAS
-    for img in get_each_img_obj(img_dir):
-        new_y = get_new_y(img, new_x)
-        new_size = (new_x, new_y)
-        new_img = img.resize(new_size, filter_mode)
+    for img in get_img_objs(img_dir):
+        args = get_resize_args(new_x, img)
+        # this is slow....
+        new_img = img.resize(*args)
         new_img.filename = img.filename
         yield new_img
         
+def get_resize_args(new_x, img):
+    filter_mode = Image.ANTIALIAS
+    new_y = get_new_y(img, new_x)
+    new_size = (new_x, new_y)
+    return (new_size, filter_mode,)
