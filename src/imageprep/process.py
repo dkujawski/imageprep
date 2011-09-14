@@ -22,7 +22,7 @@ def resize_worker(img_obj, args):
 def work(new_size, img_dir, out, md5, procs, landscape_only=False, flat=False):
     # fill the queue
     tasks = list()
-    for img in resize.get_img_objs(img_dir):
+    for img in resize.get_img_objs(img_dir, landscape_only):
         (size, mode) = resize.get_resize_args(new_size, img)
         args = (size, mode, out, img_dir, md5, flat)
         data = (img, args)
