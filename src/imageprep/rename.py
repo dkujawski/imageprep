@@ -36,8 +36,14 @@ def save_img(img_obj, out_dir, base, use_hash=False, flat=False):
         else:
             sub_dirs = img_obj.filename.replace(base, '').lstrip('/')
             new_base = os.path.dirname(os.path.join(out_dir, sub_dirs))
+            # TODO: race condition here in multiprocessing code path.
             if not os.path.exists(new_base):
-                os.makedirs(new_base)
+                try:
+                    os.makedirs(new_base)
+                except OSError as ose:
+                    # the other process beat me to it.
+                    # for now just pause and continue, the dir should be there.
+                    print "\t", ose, new_base
             new_path = os.path.join(new_base, fn)
         try:
             img_obj.save(new_path)
