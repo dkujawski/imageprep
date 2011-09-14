@@ -27,18 +27,22 @@ def build_parser():
     parser = argparse.ArgumentParser(description=DESC)
     parser.add_argument('base', nargs='+', type=is_valid_dir, 
                         help='the base directory tree to search')
-    parser.add_argument('-w', '--width', type=int, default=640, 
-                        help="new width to set for images.")
+    parser.add_argument('-m', '--max', type=int, default=640, 
+                        help="set the max resolution for the longest side.")
     parser.add_argument('-o', '--outdir', type=is_valid_dir,
                         default='./', help='output directory for new files')
     parser.add_argument('--md5', action='store_true', default=False,
                         help='use md5 checksum for new file names')
+    parser.add_argument('--land', action='store_true', default=False,
+                        help='only work on landscape images')
+    parser.add_argument('--flat', action='store_true', default=False,
+                        help='dump all images into the output dir')
     parser.add_argument('--profile', action='store_true', default=False,
                         help='profile the run')
     parser.add_argument('--faster', action='store_true', default=False,
                         help='go faster')
     parser.add_argument('--procs', nargs='?', type=int, default=2,
-                        help='when go faster, set the processes used.')
+                        help='when go faster, set the processes used.')    
     return parser
 
 def run(args):
@@ -47,11 +51,13 @@ def run(args):
         print "processing:", base
         count = 0
         if args.faster:
-            imgs = process.work(args.width, base, out, args.md5, args.procs)
+            imgs = process.work(args.max, base, out, args.md5, 
+                                args.procs, args.land, args.flat)
             count = len(imgs)
         else:
-            for img in resize.get_resized_imgs(args.width, base):
-                ret = rename.save_img(img, out, use_hash=args.md5)
+            for img in resize.get_resized_imgs(args.max, base, args.land):
+                ret = rename.save_img(img, out, base, use_hash=args.md5, 
+                                      flat=args.flat)
                 print ret
                 count += 1
         print "processed %d images." % count
