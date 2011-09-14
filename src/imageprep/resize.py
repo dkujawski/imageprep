@@ -19,7 +19,14 @@ def get_new_y(img_obj, new_x):
     old_x, old_y = img_obj.size
     return int(float(new_x) / old_x * old_y)
 
-def get_img_objs(img_dir):
+def get_new_x(img_obj, new_y):
+    """ based on the desired new x size, return the new y size necessary in 
+    order to maintain proper aspect ratio
+    """
+    old_x, old_y = img_obj.size
+    return int(float(new_y) / old_y * old_x)
+
+def get_img_objs(img_dir, landscape_only=False):
     """ walk the img_dir and build Image objects out of any images found
     """
     for root, _, files in os.walk(img_dir):
@@ -30,22 +37,34 @@ def get_img_objs(img_dir):
             except IOError as ioe:
                 print ioe, ", skipping:", fp
                 continue
-            if img.format and is_landscape(img):
-                yield img
+            if img.format:
+                if landscape_only:
+                    if is_landscape(img):
+                        yield img
+                    else:
+                        continue
+                else:
+                    yield img
 
-def get_resized_imgs(new_x, img_dir):
+def get_resized_imgs(new_x, img_dir, landscape_only=False):
     """ return list of resized Image objects for each image file found in the 
     img_dir
     """
-    for img in get_img_objs(img_dir):
+    for img in get_img_objs(img_dir, landscape_only):
         args = get_resize_args(new_x, img)
         # this is slow....
         new_img = img.resize(*args)
         new_img.filename = img.filename
         yield new_img
         
-def get_resize_args(new_x, img):
+def get_resize_args(max_size, img):
     filter_mode = Image.ANTIALIAS
-    new_y = get_new_y(img, new_x)
+    (x,y) = img.size
+    if x > y: 
+        new_y = get_new_y(img, max_size)
+        new_x = max_size
+    else:
+        new_y = max_size
+        new_x = get_new_x(img, max_size)
     new_size = (new_x, new_y)
     return (new_size, filter_mode,)

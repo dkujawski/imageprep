@@ -22,7 +22,7 @@ def get_new_filename(img_obj):
     _, ext = os.path.splitext(img_obj.filename)
     return "%s%s" % (get_hash_key(data), ext)
 
-def save_img(img_obj, out_dir, use_hash=False):
+def save_img(img_obj, out_dir, base, use_hash=False, flat=False):
         """ save the image file into the out_dir, if use_hash=True generate a
         hash based on the img_obj data and use that for the file name.
         """
@@ -30,7 +30,15 @@ def save_img(img_obj, out_dir, use_hash=False):
             fn = get_new_filename(img_obj)
         else:
             fn = os.path.basename(img_obj.filename)
-        new_path = os.path.join(out_dir, fn)
+        
+        if flat:
+            new_path = os.path.join(out_dir, fn)
+        else:
+            sub_dirs = img_obj.filename.replace(base, '').lstrip('/')
+            new_base = os.path.dirname(os.path.join(out_dir, sub_dirs))
+            if not os.path.exists(new_base):
+                os.makedirs(new_base)
+            new_path = os.path.join(new_base, fn)
         try:
             img_obj.save(new_path)
         except IOError as ioe:

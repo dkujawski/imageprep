@@ -12,19 +12,19 @@ from imageprep import resize
 def resize_worker(img_obj, args):
     print img_obj.filename, args
     img = Image.open(img_obj.filename)
-    (size, mode, out, md5) = args
+    (size, mode, out, base, md5, flat) = args
     new_img = img.resize(size, mode)
     new_img.filename = img.filename
-    fn = rename.save_img(new_img, out, use_hash=md5)
+    fn = rename.save_img(new_img, out, base, use_hash=md5, flat=flat)
 #    data = (fn, new_img.mode, new_img.size, new_img.tostring())    
     return fn
 
-def work(new_x, img_dir, out, md5, procs):
+def work(new_size, img_dir, out, md5, procs, landscape_only=False, flat=False):
     # fill the queue
     tasks = list()
     for img in resize.get_img_objs(img_dir):
-        (size, mode) = resize.get_resize_args(new_x, img)
-        args = (size, mode, out, md5)
+        (size, mode) = resize.get_resize_args(new_size, img)
+        args = (size, mode, out, img_dir, md5, flat)
         data = (img, args)
         tasks.append(data)
     
